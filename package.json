@@ -1,0 +1,35 @@
+{
+  "name": "mochi-tele-bot",
+  "version": "1.0.0",
+  "description": "Mochi Bot",
+  "main": "index.js",
+  "scripts": {
+    "start": "nodemon index.js"
+  },
+  "author": "MochiLab",
+  "license": "GPL-3.0",
+  "dependencies": {
+    "dotenv": "^8.2.0",
+    "ethereum-address": "0.0.4",
+    "hashids": "^1.2.2",
+    "mongodb": "3.0.7",
+    "mongoose": "^5.6.7",
+    "node-telegram-bot-api": "^0.30.0",
+    "request": "^2.87.0",
+    "s": "^0.1.1",
+    "telegraf": "^3.6.4",
+    "telegraf-ratelimit": "^2.0.0"
+  },
+  "devDependencies": {},
+  
+  "keywords": [
+    "telegram",
+    "telegraf",
+    "es6",
+    "nodejs",
+    "node.js",
+    "telegram-bot",
+    "telegram-bots",
+    "telegram-api"
+  ]
+}
