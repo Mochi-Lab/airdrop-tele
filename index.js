@@ -363,6 +363,7 @@ async function stepCheck(ctx) {
     ctx.reply('Please send your address holding BEP 20 $MOMA, ERC 20 $MOMA here.');
   } else if (ctx.session.step == 3) {
     if (ethereum_address.isAddress(ctx.message.text.toString())) {
+      ctx.session.eth = ctx.message.text.toString();
       var keyboard = Markup.inlineKeyboard([Markup.callbackButton('Complete ✅', 'confirm')], {
         columns: 1,
       });
