@@ -121,7 +121,7 @@ var findExistingAsync = function (ctx) {
       };
       User.findOne(findquery, function (err, result) {
         if (err) throw err;
-        console.log('Finding result', result);
+        // console.log('Finding result', result);
         if (result == null) {
           resolve("ref user doesn't exist");
           //if user doesn't exist
@@ -140,7 +140,7 @@ var findExistingAsync = function (ctx) {
               console.log('count is:', count);
             }
           );
-          console.log('result ===========', result);
+          // console.log('result ===========', result);
           ctx.session.eth = result.ethAddress;
           ctx.session.twitter = result.twitterUser;
           ctx.session.refBy = result.refBy;
@@ -199,7 +199,7 @@ var saveDataAsync = function (ctx) {
         if (err) {
           reject('error');
         }
-        console.log('finding result', result);
+        // console.log('finding result', result);
         if (result == null) {
           //if it doesn't find an existing user, saves the current data
           myobj.save(function (err) {
@@ -241,7 +241,7 @@ var saveDataAsync = function (ctx) {
               } else {
                 resolve('Saved existing data');
                 ctx.session.step = 6;
-                console.log(doc);
+                // console.log(doc);
               }
             }
           );
@@ -255,32 +255,39 @@ var saveDataAsync = function (ctx) {
 };
 
 //keyboard
-const keyboard = Markup.inlineKeyboard(
-  [Markup.callbackButton('Join Mochi NFT Limited Edition Lottery Event! 🌱', 'getAirdrop')],
-  {
-    columns: 2,
-  }
-);
+const keyboard = Markup.inlineKeyboard([Markup.callbackButton('📘 Click "Continue" to proceed', 'getAirdrop')], {
+  columns: 2,
+});
 
 function firstMessage(ctx) {
   var finalResult;
 
-  finalResult = '🥳 Welcome to Mochi NFT Limited Edition Lottery Event 🥳';
+  finalResult = `Welcome ${ctx.session.username} to 🔥Mochi NFT Lottery Event🔥`;
   finalResult += '\n';
   finalResult += '\n';
-  finalResult += 'Please click on the buttons and input the required data';
+  finalResult +=
+    '🎉🎉🎉 50 lucky winners will receive a double reward of 1 Mochi NFT Limited Edition and 1,000 MOMA each 🎉🎉🎉';
   finalResult += '\n';
   finalResult += '\n';
-  finalResult += '1.📌 Submit your receiver ETH address.';
+  finalResult += '⚠️ Deadline for submission: 12 AM UTC, 29th May, 2021⚠️';
   finalResult += '\n';
   finalResult += '\n';
-  finalResult += '2.📌 Submit your twitter username.';
+  finalResult += 'Distribution will be completed within 7 days after the Event ends.';
   finalResult += '\n';
   finalResult += '\n';
-  finalResult += '3.📌 Submit your retweet link';
-  finalResult += '\n';
-  finalResult += '\n';
-  finalResult += '4.📌 Click CHECK ✅ to check the submission.';
+  finalResult +=
+    '📘 By participating in the Event, you agree to the Mochi NFT Lottery Events Terms and Conditions. Mochi.Market ensures that your information will be treated confidentially.';
+  // finalResult += '\n';
+  // finalResult += '\n';
+  // finalResult += '1.📌 Submit your receiver ETH address.';
+  // finalResult += '\n';
+  // finalResult += '\n';
+  // finalResult += '2.📌 Submit your twitter username.';
+  // finalResult += '\n';
+  // finalResult += '\n';
+  // finalResult += '3.📌 Submit your retweet link';
+  // finalResult += '\n';
+  // finalResult += '\n';
 
   return finalResult;
 }
@@ -350,24 +357,23 @@ async function initMessage(ctx) {
 
 async function stepCheck(ctx) {
   //step check
-  if (ctx.session.step == 3) {
-    ctx.session.retweet = ctx.message.text;
-    var keyboard = Markup.inlineKeyboard([Markup.callbackButton('Check your submission ✅', 'check')], {
-      columns: 1,
-    });
-    ctx.telegram.sendMessage(ctx.from.id, 'Almost Done!', Extra.HTML().markup(keyboard));
-  } else if (ctx.session.step == 1) {
+  if (ctx.session.step == 2) {
+    ctx.session.twitter = ctx.message.text;
+    ctx.session.step = 3;
+    ctx.reply('Please send your address holding BEP 20 $MOMA, ERC 20 $MOMA here.');
+  } else if (ctx.session.step == 3) {
     if (ethereum_address.isAddress(ctx.message.text.toString())) {
-      ctx.session.eth = ctx.message.text;
-      ctx.session.step = 2;
-      ctx.reply('Submit your Twitter username, please.');
+      var keyboard = Markup.inlineKeyboard([Markup.callbackButton('Complete ✅', 'confirm')], {
+        columns: 1,
+      });
+      ctx.telegram.sendMessage(
+        ctx.from.id,
+        'Hit Complete button to submit your registration.',
+        Extra.HTML().markup(keyboard)
+      );
     } else {
       ctx.reply('Please input a valid ERC20/BEP20 address!');
     }
-  } else if (ctx.session.step == 2) {
-    ctx.session.twitter = ctx.message.text;
-    ctx.session.step = 3;
-    ctx.reply('Submit your retweet link, please.');
   } else {
     console.log('other data');
   }
@@ -376,7 +382,7 @@ async function stepCheck(ctx) {
 //bot init
 const bot = new Telegraf(config.telegraf_token); // Let's instantiate a bot using our token.
 bot.use(session());
-bot.use(Telegraf.log());
+// bot.use(Telegraf.log());
 
 bot.start(async (ctx) => {
   //bot start
@@ -394,7 +400,6 @@ bot.start(async (ctx) => {
       ctx.session.username = ctx.from.username;
       var ref = ctx.message.text.slice(7, len);
       ctx.session.refBy = ref;
-      console.log('ref:', ref);
       if (ref.length != 0) {
         var refmsg = 'Referred by: ' + ctx.session.refBy;
 
@@ -459,19 +464,34 @@ bot.action('delete', ({ deleteMessage }) => deleteMessage());
 
 bot.action('eth', (ctx) => {
   //button click ETH
-  ctx.reply('1. Submit your ERC20/BEP20 address:');
-  ctx.session.step = 1;
+  ctx.reply('Please send your address holding BEP 20 $MOMA, ERC 20 $MOMA here.');
+  ctx.session.step = 3;
 });
 
 bot.action('getAirdrop', (ctx) => {
-  ctx.reply('1. Submit your ERC20/BEP20 address:');
   ctx.session.step = 1;
+  var msg = 'Complete the tasks below to be eligible for the lottery.';
+  msg += '\n';
+  msg += '\n';
+  msg += '🔹 Like Announcement post tweet (to add link) & tag 3 friends.';
+  msg += '\n';
+  msg += '\n';
+  msg += '🔹 Invite a friend to Mochi Telegram Official group: https://t.me/mochi_market';
+  var keyboard = Markup.inlineKeyboard([Markup.callbackButton('hit DONE button when complete ✅', 'twitter')], {
+    columns: 1,
+  });
+  ctx.reply(msg, Extra.HTML().markup(keyboard));
 });
 
 bot.action('twitter', (ctx) => {
   //button click twitter
-  ctx.reply('2. Submit your Twitter username:');
   ctx.session.step = 2;
+  ctx.reply('Submit the link to your Twitter’s profile (E.g. https://twitter.com/marketmochi)');
+});
+
+bot.action('moma', (ctx) => {
+  ctx.session.step = 3;
+  ctx.reply('Please send your address holding BEP 20 $MOMA, ERC 20 $MOMA here.');
 });
 
 bot.action('refresh', (ctx) => {
@@ -512,11 +532,14 @@ bot.action('confirm', (ctx) => {
         saveDataAsync(ctx).then(function (uid) {
           var msg;
           msg = 'Completed.';
+          // msg += '\n';
+          // msg += 'Please use this referral link';
+          // msg += '\n';
+          // msg += 'https://t.me/mochi_token_airdrop_bot?start=';
+          // msg += ctx.session.refNumber;
           msg += '\n';
-          msg += 'Please use this referral link';
-          msg += '\n';
-          msg += 'https://t.me/mochi_token_airdrop_bot?start=';
-          msg += ctx.session.refNumber;
+          msg +=
+            'Make sure that the combined addresses hold at least 1,000 MOMA in total (including those being staked in Binance Smart Chain and Ethereum and MOMA rewards under vesting.';
           ctx.reply(msg);
         });
       } else {
