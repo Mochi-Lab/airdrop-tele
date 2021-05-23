@@ -180,20 +180,20 @@ var saveDataAsync = function (ctx) {
         refBy = '0';
       }
       var findquery = {
-        refNumber: refNumber,
+        refNumber,
       };
       User.findOne(findquery, function (err, result) {
         console.log('FIND ONE');
         let myobj = new User({
-          ethAddress: ethAddress,
-          twitterUser: twitterUser,
-          telegramUser: telegramUser,
-          refNumber: refNumber,
-          refBy: refBy,
-          creationDate: creationDate,
-          retweet: retweet,
-          joinTele: joinTele,
-          followed: followed,
+          ethAddress,
+          twitterUser,
+          telegramUser,
+          refNumber,
+          refBy,
+          creationDate,
+          retweet,
+          joinTele,
+          followed,
         });
 
         if (err) {
@@ -216,19 +216,19 @@ var saveDataAsync = function (ctx) {
           //if it finds an existing user, it updates the data
           User.findOneAndUpdate(
             {
-              refNumber: refNumber,
+              refNumber,
             },
             {
               $set: {
-                ethAddress: ethAddress,
-                twitterUser: twitterUser,
-                telegramUser: telegramUser,
-                refNumber: refNumber,
-                refBy: refBy,
-                creationDate: creationDate,
-                retweet: retweet,
-                joinTele: joinTele,
-                followed: followed,
+                ethAddress,
+                twitterUser,
+                telegramUser,
+                refNumber,
+                refBy,
+                creationDate,
+                retweet,
+                joinTele,
+                followed,
               },
             },
             {
@@ -328,10 +328,10 @@ function makeMessage(ctx) {
   finalResult += ctx.session.refNumber;
   finalResult += '\n';
   finalResult += '💵 Number of referrals: ';
-  finalResult += ctx.session.count;
+  finalResult += ctx.session.count || '0';
   finalResult += '\n';
   finalResult += '👥 Referred by: ';
-  finalResult += ctx.session.refByName;
+  finalResult += ctx.session.refByName || '';
 
   return finalResult;
 }
@@ -381,8 +381,9 @@ bot.use(Telegraf.log());
 bot.start(async (ctx) => {
   //bot start
   //parameter parsing
-  ctx.session.refByName = '/';
+  ctx.session.refByName = '';
   ctx.session.count = 0;
+
   findExistingAsync(ctx).then(function (uid) {
     var len = ctx.message.text.length;
     if (ctx.from.username == null) {
@@ -416,6 +417,7 @@ bot.start(async (ctx) => {
     }
   });
 });
+
 bot.on('message', async (ctx) => {
   //bot listens to any message
   if (ctx.from.username == null) {
@@ -494,7 +496,7 @@ bot.action('check', async (ctx) => {
   }
   var msg = await check(ctx);
   var info = makeMessage(ctx);
-  var keyboard = Markup.inlineKeyboard([Markup.callbackButton('Check ✅', 'check')], {
+  var keyboard = Markup.inlineKeyboard([Markup.callbackButton('Submit ✅', 'confirm')], {
     columns: 1,
   });
   ctx.telegram.sendMessage(ctx.from.id, info + '\n \n' + msg, Extra.HTML().markup(keyboard));
