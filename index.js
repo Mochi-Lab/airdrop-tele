@@ -8,11 +8,12 @@ var mongoose = require('mongoose');
 const User = require('./user');
 var ethereum_address = require('ethereum-address'); //used for verifying eth address
 
-mongoose.connect(config.database, {
+mongoose.connect(config.mongoURL, {
   socketTimeoutMS: 45000,
   keepAlive: true,
-  reconnectTries: 10,
   poolSize: 10,
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
 });
 const db = mongoose.connection;
 
@@ -253,14 +254,7 @@ var saveDataAsync = function (ctx) {
 
 //keyboard
 const keyboard = Markup.inlineKeyboard(
-  [
-    // Markup.callbackButton('ETH🔑', 'eth'),
-    // Markup.callbackButton('🐦Twitter', 'twitter'),
-    // Markup.callbackButton('♻️Refresh', 'refresh'),
-    // Markup.callbackButton('Check ✅', 'check'),
-    // Markup.callbackButton('Confirm 🏁', 'confirm'),
-    Markup.callbackButton('Get your Mochi Airdrop! 🌱', 'getAirdrop'),
-  ],
+  [Markup.callbackButton('Join Mochi NFT Limited Edition Lottery Event! 🌱', 'getAirdrop')],
   {
     columns: 2,
   }
@@ -269,56 +263,45 @@ const keyboard = Markup.inlineKeyboard(
 function firstMessage(ctx) {
   var finalResult;
 
-  finalResult = '📱📱 Welcome to Mochi Airdrop bot! 📱📱';
+  finalResult = '🥳 Welcome to Mochi NFT Limited Edition Lottery Event 🥳';
   finalResult += '\n';
   finalResult += '\n';
-  finalResult += '1.📌Please click on the buttons and input the required data';
+  finalResult += 'Please click on the buttons and input the required data';
   finalResult += '\n';
-  finalResult += '2.📌Follow us on Twitter: https://twitter.com/MarketMochi';
   finalResult += '\n';
-  finalResult += '3.Retweet our pinned Twitter: https://twitter.com/MarketMochi/status/1382424446904983564';
+  finalResult += '1.📌 Submit your receiver ETH address.';
   finalResult += '\n';
-  finalResult += '4.📌Join our telegram: https://t.me/mochi_market';
   finalResult += '\n';
-  finalResult += '5.📌Follow our medium: https://mochi-market.medium.com/';
+  finalResult += '2.📌 Submit your twitter username.';
   finalResult += '\n';
-  finalResult += '6.⚠️⚠️ Please click CHECK✅ to check the submission.⚠️⚠️';
+  finalResult += '\n';
+  finalResult += '3.📌 Submit your retweet link';
+  finalResult += '\n';
+  finalResult += '\n';
+  finalResult += '4.📌 Click CHECK ✅ to check the submission.';
 
   return finalResult;
 }
 
 async function check(ctx) {
   var finalResult;
-  finalResult = '1.Filled in Twitter address';
+  finalResult = '1. Submitted ERC20/BEP20 address';
+  if (ctx.session.eth) {
+    finalResult += ' ✅';
+  } else {
+    finalResult += ' ❌';
+  }
+  finalResult += '\n';
+  finalResult += '2. Submitted Twitter address';
   if (ctx.session.twitter) {
     finalResult += ' ✅';
   } else {
     finalResult += ' ❌';
   }
   finalResult += '\n';
-  finalResult += '2.Follow us on Twitter: https://twitter.com/MarketMochi';
-  if (ctx.session.followed === '1') {
-    finalResult += ' ✅';
-  } else {
-    finalResult += ' ❌';
-  }
-  finalResult += '\n';
-  finalResult += '3.Join our channel: https://t.me/mochi_market';
-  if (ctx.session.joinTele === '1') {
-    finalResult += ' ✅';
-  } else {
-    finalResult += ' ❌';
-  }
-  finalResult += '\n';
-  finalResult += '4.Retweet our pinned Twitter: https://twitter.com/MarketMochi/status/1382424446904983564';
-  if (ctx.session.retweet === '1') {
-    finalResult += ' ✅';
-  } else {
-    finalResult += ' ❌';
-  }
-  finalResult += '\n';
-  finalResult += '5.Filled ETH address';
-  if (ctx.session.eth) {
+
+  finalResult += '3. Submitted retweet link';
+  if (ctx.session.retweet) {
     finalResult += ' ✅';
   } else {
     finalResult += ' ❌';
@@ -333,19 +316,19 @@ function makeMessage(ctx) {
   finalResult = '👤ID: ';
   finalResult += ctx.from.id;
   finalResult += '\n';
-  finalResult += '🔑ETH Address: ';
+  finalResult += '🔑 ETH Address: ';
   finalResult += ctx.session.eth;
   finalResult += '\n';
-  finalResult += '🐦Twitter username: ';
+  finalResult += '🐦 Twitter username: ';
   finalResult += ctx.session.twitter;
   finalResult += '\n';
-  finalResult += '💰Referral link: https://t.me/MochiBot?start=';
+  finalResult += '💰 Referral link: https://t.me/mochi_token_airdrop_bot?start=';
   finalResult += ctx.session.refNumber;
   finalResult += '\n';
-  finalResult += '💵Number of referrals: ';
+  finalResult += '💵 Number of referrals: ';
   finalResult += ctx.session.count;
   finalResult += '\n';
-  finalResult += '👥Referred by: ';
+  finalResult += '👥 Referred by: ';
   finalResult += ctx.session.refByName;
 
   return finalResult;
@@ -365,9 +348,9 @@ async function initMessage(ctx) {
 
 async function stepCheck(ctx) {
   //step check
-  if (ctx.session.step == 2) {
-    ctx.session.twitter = ctx.message.text;
-    var keyboard = Markup.inlineKeyboard([Markup.callbackButton('Check ✅', 'check')], {
+  if (ctx.session.step == 3) {
+    ctx.session.retweet = ctx.message.text;
+    var keyboard = Markup.inlineKeyboard([Markup.callbackButton('Check your submission ✅', 'check')], {
       columns: 1,
     });
     ctx.telegram.sendMessage(ctx.from.id, 'Almost Done!', Extra.HTML().markup(keyboard));
@@ -375,10 +358,14 @@ async function stepCheck(ctx) {
     if (ethereum_address.isAddress(ctx.message.text.toString())) {
       ctx.session.eth = ctx.message.text;
       ctx.session.step = 2;
-      ctx.reply('Input Twitter username, please.');
+      ctx.reply('Submit your Twitter username, please.');
     } else {
-      ctx.reply('Please input a valid ethereum address!');
+      ctx.reply('Please input a valid ERC20/BEP20 address!');
     }
+  } else if (ctx.session.step == 2) {
+    ctx.session.twitter = ctx.message.text;
+    ctx.session.step = 3;
+    ctx.reply('Submit your retweet link, please.');
   } else {
     console.log('other data');
   }
@@ -468,18 +455,18 @@ bot.action('delete', ({ deleteMessage }) => deleteMessage());
 
 bot.action('eth', (ctx) => {
   //button click ETH
-  ctx.reply('Input your ERC-20 compatible Ethereum address (The same address that you put into the airdrop form).');
+  ctx.reply('1. Submit your ERC20/BEP20 address:');
   ctx.session.step = 1;
 });
 
 bot.action('getAirdrop', (ctx) => {
-  ctx.reply('Input your ERC-20 compatible Ethereum address (The same address that you put into the airdrop form).');
+  ctx.reply('1. Submit your ERC20/BEP20 address:');
   ctx.session.step = 1;
 });
 
 bot.action('twitter', (ctx) => {
   //button click twitter
-  ctx.reply('Input Twitter username, please.');
+  ctx.reply('2. Submit your Twitter username:');
   ctx.session.step = 2;
 });
 
@@ -524,7 +511,7 @@ bot.action('confirm', (ctx) => {
           msg += '\n';
           msg += 'Please use this referral link';
           msg += '\n';
-          msg += 'https://t.me/MochiBot?start=';
+          msg += 'https://t.me/mochi_token_airdrop_bot?start=';
           msg += ctx.session.refNumber;
           ctx.reply(msg);
         });
