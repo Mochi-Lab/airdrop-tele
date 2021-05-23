@@ -488,7 +488,7 @@ bot.action('getAirdrop', (ctx) => {
 bot.action('twitter', (ctx) => {
   //button click twitter
   ctx.session.step = 2;
-  ctx.reply('Submit the link to your Twitter’s profile (E.g. https://twitter.com/marketmochi)');
+  ctx.reply('Submit the link of your Twitter’s profile (E.g. https://twitter.com/marketmochi)');
 });
 
 bot.action('moma', (ctx) => {
