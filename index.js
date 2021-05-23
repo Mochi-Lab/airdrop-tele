@@ -475,6 +475,7 @@ bot.action('getAirdrop', (ctx) => {
   msg += '\n';
   msg += '🔹 Like Announcement post tweet (to add link) & tag 3 friends.';
   msg += '\n';
+  msg += 'https://twitter.com';
   msg += '\n';
   msg += '🔹 Invite a friend to Mochi Telegram Official group: https://t.me/mochi_market';
   var keyboard = Markup.inlineKeyboard([Markup.callbackButton('hit DONE button when complete ✅', 'twitter')], {
