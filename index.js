@@ -67,21 +67,21 @@ var refByNameAsync = function (ctx) {
   //finds and returns the name of the referrer
   return new Promise(function (resolve, reject) {
     try {
-      var RefBy = ctx.session.refBy;
+      var refBy = ctx.session.refBy;
       var findquery = {
-        refNumber: RefBy,
+        refNumber: refBy,
       };
       User.findOne(findquery, function (err, result) {
         if (err) throw err;
         if (result == null) {
           //if user doesn't exist
-          ctx.session.refByName = '/';
-          resolve('found none');
+          ctx.session.refByName = '';
+          resolve('ref by no one');
           return false;
         } else {
           //if user exists, return it's data
           ctx.session.refByName = result.telegramUser;
-          resolve('works');
+          resolve('ref by', ctx.session.refByName);
           console.log('Found TG USER REFFER BY:', ctx.session.refByName);
         }
       });
@@ -91,6 +91,7 @@ var refByNameAsync = function (ctx) {
     }
   });
 };
+
 var checkDataAsync = function (ctx) {
   //checks the inputed user data
   return new Promise(function (resolve, reject) {
@@ -108,6 +109,7 @@ var checkDataAsync = function (ctx) {
     }
   });
 };
+
 var findExistingAsync = function (ctx) {
   //finds existing members in the database
   return new Promise(function (resolve, reject) {
@@ -121,7 +123,7 @@ var findExistingAsync = function (ctx) {
         if (err) throw err;
         console.log('Finding result', result);
         if (result == null) {
-          resolve("user doesn't exist");
+          resolve("ref user doesn't exist");
           //if user doesn't exist
           return false;
         } else {
@@ -163,35 +165,35 @@ var saveDataAsync = function (ctx) {
   return new Promise(function (resolve, reject) {
     try {
       console.log('SAVING DATA');
-      var CreationDate = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''); //cleans up creation date
-      var EthAddres = ctx.session.eth.toString();
-      var TwitterUser = ctx.session.twitter.toString();
-      var TelegramUser = ctx.session.username.toString();
-      var RefNumber = ctx.session.refNumber.toString();
-      var RefBy = '0';
-      var Retweet = ctx.session.retweet;
-      var JoinTele = ctx.session.joinTele;
-      var Followed = ctx.session.followed;
+      var creationDate = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, ''); //cleans up creation date
+      var ethAddress = ctx.session.eth.toString();
+      var twitterUser = ctx.session.twitter.toString();
+      var telegramUser = ctx.session.username.toString();
+      var refNumber = ctx.session.refNumber.toString();
+      var refBy = '0';
+      var retweet = ctx.session.retweet;
+      var joinTele = ctx.session.joinTele;
+      var followed = ctx.session.followed;
       if (ctx.session.refBy != null) {
-        RefBy = ctx.session.refBy;
+        refBy = ctx.session.refBy;
       } else {
-        RefBy = '0';
+        refBy = '0';
       }
       var findquery = {
-        refNumber: RefNumber,
+        refNumber: refNumber,
       };
       User.findOne(findquery, function (err, result) {
         console.log('FIND ONE');
         let myobj = new User({
-          ethAddress: EthAddres,
-          twitterUser: TwitterUser,
-          telegramUser: TelegramUser,
-          refNumber: RefNumber,
-          refBy: RefBy,
-          creationDate: CreationDate,
-          retweet: Retweet,
-          joinTele: JoinTele,
-          followed: Followed,
+          ethAddress: ethAddress,
+          twitterUser: twitterUser,
+          telegramUser: telegramUser,
+          refNumber: refNumber,
+          refBy: refBy,
+          creationDate: creationDate,
+          retweet: retweet,
+          joinTele: joinTele,
+          followed: followed,
         });
 
         if (err) {
@@ -214,19 +216,19 @@ var saveDataAsync = function (ctx) {
           //if it finds an existing user, it updates the data
           User.findOneAndUpdate(
             {
-              refNumber: RefNumber,
+              refNumber: refNumber,
             },
             {
               $set: {
-                ethAddress: EthAddres,
-                twitterUser: TwitterUser,
-                telegramUser: TelegramUser,
-                refNumber: RefNumber,
-                refBy: RefBy,
-                creationDate: CreationDate,
-                retweet: Retweet,
-                joinTele: JoinTele,
-                followed: Followed,
+                ethAddress: ethAddress,
+                twitterUser: twitterUser,
+                telegramUser: telegramUser,
+                refNumber: refNumber,
+                refBy: refBy,
+                creationDate: creationDate,
+                retweet: retweet,
+                joinTele: joinTele,
+                followed: followed,
               },
             },
             {
