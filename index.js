@@ -527,25 +527,25 @@ bot.action('confirm', (ctx) => {
   checkDataAsync(ctx).then(function (uid) {
     var check = uid;
     console.log('CHECK', check);
-    refByNameAsync(ctx).then(function (uid) {
-      if (check == true) {
-        saveDataAsync(ctx).then(function (uid) {
-          var msg;
-          msg = 'Completed.';
-          // msg += '\n';
-          // msg += 'Please use this referral link';
-          // msg += '\n';
-          // msg += 'https://t.me/mochi_token_airdrop_bot?start=';
-          // msg += ctx.session.refNumber;
-          msg += '\n';
-          msg +=
-            'Make sure that the combined addresses hold at least 1,000 MOMA in total (including those being staked in Binance Smart Chain and Ethereum and MOMA rewards under vesting.';
-          ctx.reply(msg);
-        });
-      } else {
-        ctx.reply('Please input all data');
-      }
+    // refByNameAsync(ctx).then(function (uid) {
+    //   if (check == true) {
+    saveDataAsync(ctx).then(function (uid) {
+      var msg;
+      msg = 'Completed.';
+      // msg += '\n';
+      // msg += 'Please use this referral link';
+      // msg += '\n';
+      // msg += 'https://t.me/mochi_token_airdrop_bot?start=';
+      // msg += ctx.session.refNumber;
+      msg += '\n';
+      msg +=
+        'Make sure that the combined addresses hold at least 1,000 MOMA in total (including those being staked in Binance Smart Chain and Ethereum and MOMA rewards under vesting.';
+      ctx.reply(msg);
     });
+    // } else {
+    //   ctx.reply('Please input all data');
+    // }
+    // });
   });
 });
 bot.use(rateLimit(buttonsLimit));
