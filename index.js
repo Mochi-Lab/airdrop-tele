@@ -294,7 +294,7 @@ function firstMessage(ctx) {
 
 async function check(ctx) {
   var finalResult;
-  finalResult = '1. Submitted ERC20/BEP20 address';
+  finalResult = '1. Submitted BEP20 address';
   if (ctx.session.eth) {
     finalResult += ' ✅';
   } else {
@@ -360,7 +360,7 @@ async function stepCheck(ctx) {
   if (ctx.session.step == 2) {
     ctx.session.twitter = ctx.message.text;
     ctx.session.step = 3;
-    ctx.reply('Please send your address holding BEP 20 $MOMA, ERC 20 $MOMA here.');
+    ctx.reply('Please send your address holding BEP 20 $MOMA here.');
   } else if (ctx.session.step == 3) {
     if (ethereum_address.isAddress(ctx.message.text.toString())) {
       ctx.session.eth = ctx.message.text.toString();
@@ -373,7 +373,7 @@ async function stepCheck(ctx) {
         Extra.HTML().markup(keyboard)
       );
     } else {
-      ctx.reply('Please input a valid ERC20/BEP20 address!');
+      ctx.reply('Please input a valid BEP20 address!');
     }
   } else {
     console.log('other data');
@@ -465,7 +465,7 @@ bot.action('delete', ({ deleteMessage }) => deleteMessage());
 
 bot.action('eth', (ctx) => {
   //button click ETH
-  ctx.reply('Please send your address holding BEP 20 $MOMA, ERC 20 $MOMA here.');
+  ctx.reply('Please send your address holding BEP 20 $MOMA here.');
   ctx.session.step = 3;
 });
 
@@ -493,7 +493,7 @@ bot.action('twitter', (ctx) => {
 
 bot.action('moma', (ctx) => {
   ctx.session.step = 3;
-  ctx.reply('Please send your address holding BEP 20 $MOMA, ERC 20 $MOMA here.');
+  ctx.reply('Please send your address holding BEP 20 $MOMA here.');
 });
 
 bot.action('refresh', (ctx) => {
